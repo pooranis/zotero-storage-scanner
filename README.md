@@ -20,6 +20,10 @@ If you run zotero-storage-scanner you will see a zotero process (name dependand 
 
 ------
 
+### Modifications in this fork
+
+I turned off the multiple files of same type tag (I often have papers with supplements) and added a tag for #internal storage.  So, I can keep track of which files are internal Zotero storage, and which are linked in separate folder.
+
 ### Build instructions
 
 See https://esbuild.github.io/getting-started/#install-esbuild
