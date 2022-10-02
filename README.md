@@ -17,3 +17,25 @@ Please remain on the latest version of the add-on. My time is extremely limited 
 There is no UI, this plugin scans your library after being launched from tools->storage scanner in the background.
 
 If you run zotero-storage-scanner you will see a zotero process (name dependand on OS) kick off in your proccess manager (top, activity monitor, Task Manager), however as it works through your library it live updates two tags `#duplicates` and `#broken` as it goes. If those tags have no items attached to them after some time (variable depending on size of library) then you are golden, if there are entries tagged in either then your likely have duplicate articles or a file/DB has issues been identified with the most likely cause being a "missing" PDF sometimes caused by incomplete syncing.
+
+------
+
+### Build instructions
+
+See https://esbuild.github.io/getting-started/#install-esbuild
+
+If not already installed
+
+```bash
+npm install -g esbuild
+## install project modules locally
+npm install rimraf
+```
+
+Then:
+
+```bash
+npm run build
+```
+
+This will create *xpi/zotero-storage-scanner-version.machine_name.xpi*
