@@ -31,6 +31,7 @@ class StorageScanner {
         SELECT
           item.itemID,
           attachment.path,
+          attachment.contentType,
           CASE attachment.linkMode WHEN ${Zotero.Attachments.LINK_MODE_LINKED_URL} THEN 1 ELSE 0 END AS isLinkedURL,
           COALESCE(duplicates.duplicates, 1) as duplicates
         FROM items item
@@ -75,7 +76,7 @@ class StorageScanner {
     if (!this.duplicates) return
 
     // Zotero.Attachments.LINK_MODE_LINKED_URL // ignore this
-    // Zotero.Attachments.LINK_MODE_IMPORTED_URL // snapshot
+    // Zotero.Attachments.LINK_MODE_IMPORTED_URL // any imported storage file
     // Zotero.Attachments.LINK_MODE_IMPORTED_FILE
     // LINK_MODE_LINKED_FILE
 
@@ -84,7 +85,7 @@ class StorageScanner {
     Zotero.debug(`StorageScanner.attachments: ${attachments.length}`)
 
     for (const attachment of attachments) {
-      Zotero.debug(`StorageScanner.attachment: ${JSON.stringify({itemID: attachment.itemID, path: attachment.path, duplicates: attachment.duplicates})}`)
+      Zotero.debug(`StorageScanner.attachment: ${JSON.stringify({itemID: attachment.itemID, path: attachment.path, type: attachment.contentType, duplicates: attachment.duplicates})}`)
       const item = await Zotero.Items.getAsync(attachment.itemID)
       /*
         because getAsync isn't "same as get but asynchronously" but "sort
@@ -99,8 +100,15 @@ class StorageScanner {
 
       let save = false
 
+      // poorani modification
+      if (attachment.contentType === 'application/pdf') {
+        // keep track of internal storage
+        if (this.updateTag(item, '#internal', !attachment.isLinkedURL && attachment.path.startsWith('storage:'))) save = true
+      }
+
       if (this.updateTag(item, '#broken_attachments', !attachment.isLinkedURL && !(await item.getFilePathAsync()))) save = true
-      if (this.updateTag(item, '#multiple_attachments_of_same_type', attachment.duplicates > 1)) save = true
+      // if (this.updateTag(item, '#multiple_attachments_of_same_type', attachment.duplicates > 1)) save = true
+      // end modification
       Zotero.debug(`StorageScanner.save: ${save}`)
 
       if (save) await item.saveTx()
